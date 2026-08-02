@@ -1,4 +1,4 @@
-@php $company = 'Phillips Co'; $brand = 'Textback'; $domain = 'text-back.net'; @endphp
+@php $company = 'Phillips Co'; $brand = 'Textback'; $domain = 'text-back.net'; $supportEmail = 'support@'.$domain; @endphp
 
 <x-legal-layout title="Terms of Service" updated="August 2026">
 <p>These Terms govern your use of {{ $brand }}, a service operated by {{ $company }}. By creating an account or using the service you agree to these Terms.</p>
@@ -29,5 +29,5 @@
 <p>We may update these Terms; material changes will be posted here with a new date.</p>
 
 <h2>Contact</h2>
-<p><a href="mailto:support@{{ $domain }}">support@{{ $domain }}</a></p>
+<p><a href="mailto:{{ $supportEmail }}">{{ $supportEmail }}</a>. See our <a href="{{ route('contact') }}">contact page</a> for more ways to reach us.</p>
 </x-legal-layout>

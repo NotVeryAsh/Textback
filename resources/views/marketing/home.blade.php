@@ -104,6 +104,7 @@
                     <div>
                         <p class="mb-2 font-semibold text-gray-900">Contact</p>
                         <ul class="space-y-1.5 text-gray-500">
+                            <li><a href="{{ route('contact') }}" class="hover:text-gray-900">Contact &amp; support</a></li>
                             <li><a href="mailto:support@text-back.net" class="hover:text-gray-900">support@text-back.net</a></li>
                         </ul>
                     </div>

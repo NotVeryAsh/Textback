@@ -1,4 +1,4 @@
-@php $company = 'Phillips Co'; $brand = 'Textback'; $domain = 'text-back.net'; @endphp
+@php $company = 'Phillips Co'; $brand = 'Textback'; $domain = 'text-back.net'; $privacyEmail = 'privacy@'.$domain; @endphp
 
 <x-legal-layout title="Privacy Policy" updated="August 2026">
 <p>{{ $brand }} ("{{ $brand }}", "we", "us") is operated by {{ $company }}. This policy explains what information we collect, how we use it, and your choices. It applies to {{ $domain }} and the {{ $brand }} service.</p>
@@ -32,5 +32,5 @@
 <p>You can opt out of texts at any time by replying STOP. You can request access to or deletion of your data by contacting us. Message recipients can opt out directly by replying STOP to any message.</p>
 
 <h2>Contact</h2>
-<p>Questions about this policy: <a href="mailto:privacy@{{ $domain }}">privacy@{{ $domain }}</a>.</p>
+<p>Questions about this policy: <a href="mailto:{{ $privacyEmail }}">{{ $privacyEmail }}</a>. See also our <a href="{{ route('contact') }}">contact page</a>.</p>
 </x-legal-layout>
