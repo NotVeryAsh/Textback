@@ -6,6 +6,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Contact / support
+    |--------------------------------------------------------------------------
+    | Where the public contact form delivers messages.
+    */
+    'contact_email' => env('CONTACT_EMAIL', 'support@text-back.net'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Trial
     |--------------------------------------------------------------------------
     | The trial ends at whichever comes first: `trial_days` elapsed, OR the

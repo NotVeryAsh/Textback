@@ -18,7 +18,8 @@ Route::view('/', 'marketing.home')->name('home');
 // Public legal + contact pages (required for A2P 10DLC registration + general use).
 Route::view('/privacy', 'legal.privacy')->name('privacy');
 Route::view('/terms', 'legal.terms')->name('terms');
-Route::view('/contact', 'legal.contact')->name('contact');
+Route::get('/contact', [\App\Http\Controllers\ContactController::class, 'show'])->name('contact');
+Route::post('/contact', [\App\Http\Controllers\ContactController::class, 'send'])->name('contact.send');
 
 // Google sign-in (Socialite). Guarded: 404 when creds are absent.
 Route::get('/auth/google/redirect', [GoogleController::class, 'redirect'])->name('google.redirect');
