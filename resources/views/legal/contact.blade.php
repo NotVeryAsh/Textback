@@ -5,7 +5,7 @@
 
 @if (session('sent'))
     <div style="margin:1rem 0;" class="rounded-md bg-green-50 p-3 text-sm text-green-700">
-        Thanks - your message has been sent.
+        Message sent.
     </div>
 @endif
 
