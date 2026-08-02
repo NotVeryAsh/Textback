@@ -6,10 +6,10 @@ namespace App\Jobs;
 
 use App\Models\Lead;
 use App\Services\Twilio\TwilioClientFactory;
-use App\Support\Phone;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Queue\Queueable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Str;
 
 class ForwardInboundSms implements ShouldQueue
 {
@@ -18,9 +18,10 @@ class ForwardInboundSms implements ShouldQueue
     public function __construct(public int $leadId, public string $body) {}
 
     /**
-     * Relay the lead's message to the operator's own phone (from the Textback
-     * number) so they can simply reply from their phone. Their reply comes back
-     * to the Textback number and is routed to this lead. Best-effort only.
+     * Alert the operator (by SMS to their cell) that a lead replied, so they can
+     * open the app and respond there. This is a notification only - the operator
+     * replies in the dashboard (correct, concurrency-safe routing), not by
+     * texting back on their personal phone.
      */
     public function handle(TwilioClientFactory $factory): void
     {
@@ -36,8 +37,11 @@ class ForwardInboundSms implements ShouldQueue
             return;
         }
 
-        // Prefix with who it's from so the operator knows who they're replying to.
-        $notice = sprintf('%s (%s): %s', $lead->displayName(), Phone::pretty($lead->phone), $this->body);
+        $notice = sprintf(
+            'Textback: %s replied "%s". Open your dashboard to respond.',
+            $lead->displayName(),
+            Str::limit($this->body, 120),
+        );
 
         if (! $factory->configured()) {
             Log::info('Inbound reply forward skipped (Twilio not configured)', [

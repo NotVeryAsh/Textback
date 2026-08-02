@@ -19,10 +19,11 @@ class TwilioSmsController extends Controller
     private const OPT_OUT_KEYWORDS = ['STOP', 'STOPALL', 'UNSUBSCRIBE', 'CANCEL', 'END', 'QUIT'];
 
     /**
-     * Inbound SMS to the Textback number. Two directions of the relay:
-     *  - from the operator's own phone -> relay to the lead they're talking to
-     *  - from a lead -> record it, mark replied, and relay to the operator's phone
-     * Everything is recorded so the conversation is also visible in the app.
+     * Inbound SMS from a lead replying to the text-back. Record it, mark the
+     * lead as replied, and notify the operator so they respond IN the app
+     * (the correct, concurrency-safe channel). Opt-out keywords mark the lead
+     * ignored. The operator does not reply from their personal SMS - that model
+     * misroutes when multiple conversations are active (see COMPETITOR-RESEARCH).
      */
     public function incoming(Request $request, SmsSender $sender): Response
     {
@@ -35,19 +36,6 @@ class TwilioSmsController extends Controller
         $from = Phone::normalize((string) $request->input('From')) ?? (string) $request->input('From');
         $body = (string) $request->input('Body');
 
-        // Operator replying from their own phone -> send it on to the active lead.
-        if ($account->operator_cell !== null && $from === Phone::normalize($account->operator_cell)) {
-            $lead = $account->activeLead();
-
-            if ($lead !== null && trim($body) !== '') {
-                $sender->send($account, $lead->phone, $body, $lead);
-                $lead->update(['last_contacted_at' => now()]);
-            }
-
-            return $this->emptyTwiml();
-        }
-
-        // Otherwise it's the caller (lead) replying.
         $lead = $account->leads()->where('phone', $from)->first();
         $isOptOut = in_array(strtoupper(trim($body)), self::OPT_OUT_KEYWORDS, true);
 
@@ -59,7 +47,7 @@ class TwilioSmsController extends Controller
 
         $sender->recordInbound($account, $from, $body, $lead, $request->input('MessageSid'));
 
-        // Relay the lead's message to the operator's phone so they can reply there.
+        // Alert the operator on their phone; they respond in the dashboard.
         if ($lead !== null && ! $isOptOut) {
             ForwardInboundSms::dispatch($lead->id, $body);
         }
