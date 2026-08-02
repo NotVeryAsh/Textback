@@ -29,6 +29,9 @@ class ContactController extends Controller
             new ContactMessage($data['name'], $data['email'], $data['message']),
         );
 
-        return back()->with('sent', true);
+        // Redirect to the canonical contact URL (not back(), which relies on the
+        // Referer header that Cloudflare can strip). Flash persists on that page
+        // until the user navigates away or refreshes.
+        return redirect()->route('contact')->with('sent', true);
     }
 }
