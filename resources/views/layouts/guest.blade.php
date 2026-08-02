@@ -22,7 +22,11 @@
                 {{ $slot }}
             </div>
 
-            <p class="mt-6 text-xs text-gray-400">Never lose a lead to a missed call.</p>
+            <div class="mt-6 flex items-center gap-3 text-xs text-gray-400">
+                <a href="{{ route('privacy') }}" class="hover:text-gray-600">Privacy</a>
+                <span>&middot;</span>
+                <a href="{{ route('terms') }}" class="hover:text-gray-600">Terms</a>
+            </div>
         </div>
     </body>
 </html>
