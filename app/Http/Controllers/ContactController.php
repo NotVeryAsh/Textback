@@ -20,9 +20,9 @@ class ContactController extends Controller
     public function send(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'name' => ['required', 'string', 'max:120'],
-            'email' => ['required', 'email', 'max:190'],
-            'message' => ['required', 'string', 'max:5000'],
+            'name' => ['required', 'string', 'max:100'],
+            'email' => ['required', 'email', 'max:254'], // RFC 5321 max email length
+            'message' => ['required', 'string', 'max:2000'],
         ]);
 
         Mail::to(config('textback.contact_email'))->send(
