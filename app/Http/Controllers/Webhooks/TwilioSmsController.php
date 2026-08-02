@@ -19,8 +19,10 @@ class TwilioSmsController extends Controller
     private const OPT_OUT_KEYWORDS = ['STOP', 'STOPALL', 'UNSUBSCRIBE', 'CANCEL', 'END', 'QUIT'];
 
     /**
-     * Inbound SMS (a lead replying). Record it, mark the lead as replied, and
-     * notify the operator. Opt-out keywords mark the lead as ignored.
+     * Inbound SMS to the Textback number. Two directions of the relay:
+     *  - from the operator's own phone -> relay to the lead they're talking to
+     *  - from a lead -> record it, mark replied, and relay to the operator's phone
+     * Everything is recorded so the conversation is also visible in the app.
      */
     public function incoming(Request $request, SmsSender $sender): Response
     {
@@ -33,8 +35,20 @@ class TwilioSmsController extends Controller
         $from = Phone::normalize((string) $request->input('From')) ?? (string) $request->input('From');
         $body = (string) $request->input('Body');
 
-        $lead = $account->leads()->where('phone', $from)->first();
+        // Operator replying from their own phone -> send it on to the active lead.
+        if ($account->operator_cell !== null && $from === Phone::normalize($account->operator_cell)) {
+            $lead = $account->activeLead();
 
+            if ($lead !== null && trim($body) !== '') {
+                $sender->send($account, $lead->phone, $body, $lead);
+                $lead->update(['last_contacted_at' => now()]);
+            }
+
+            return $this->emptyTwiml();
+        }
+
+        // Otherwise it's the caller (lead) replying.
+        $lead = $account->leads()->where('phone', $from)->first();
         $isOptOut = in_array(strtoupper(trim($body)), self::OPT_OUT_KEYWORDS, true);
 
         if ($lead !== null) {
@@ -45,6 +59,7 @@ class TwilioSmsController extends Controller
 
         $sender->recordInbound($account, $from, $body, $lead, $request->input('MessageSid'));
 
+        // Relay the lead's message to the operator's phone so they can reply there.
         if ($lead !== null && ! $isOptOut) {
             ForwardInboundSms::dispatch($lead->id, $body);
         }

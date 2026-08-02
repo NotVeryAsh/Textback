@@ -108,4 +108,42 @@ class TwilioWebhookTest extends TestCase
 
         $this->assertSame(LeadStatus::Ignored, $lead->fresh()->status);
     }
+
+    public function test_operator_reply_relays_to_the_active_lead(): void
+    {
+        Queue::fake();
+        $account = Account::factory()->create([
+            'twilio_number' => '+15557654321',
+            'operator_cell' => '+15550000001',
+        ]);
+        $lead = Lead::factory()->for($account)->create(['phone' => '+14155558888']);
+
+        // A recent inbound from the lead makes it the active conversation.
+        $account->messages()->create([
+            'lead_id' => $lead->id,
+            'direction' => 'in',
+            'from' => $lead->phone,
+            'to' => $account->twilio_number,
+            'body' => 'hi there',
+            'status' => 'received',
+        ]);
+
+        // Operator replies from their own phone to the Textback number.
+        $this->post('/webhooks/twilio/sms', [
+            'To' => $account->twilio_number,
+            'From' => $account->operator_cell,
+            'Body' => 'Sure, happy to help with that',
+            'MessageSid' => 'SMop1',
+        ])->assertOk();
+
+        // It is relayed to the lead as an outbound message.
+        $this->assertDatabaseHas('messages', [
+            'account_id' => $account->id,
+            'lead_id' => $lead->id,
+            'to' => $lead->phone,
+            'direction' => 'out',
+            'body' => 'Sure, happy to help with that',
+        ]);
+        Queue::assertPushed(SendSms::class);
+    }
 }

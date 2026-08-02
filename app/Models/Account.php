@@ -146,6 +146,26 @@ class Account extends Model
         return $this->leads_recovered_count > 0;
     }
 
+    /**
+     * The lead the operator is currently conversing with: the one whose message
+     * came in most recently, so an operator reply from their phone routes there.
+     * Falls back to the most recently contacted lead.
+     */
+    public function activeLead(): ?Lead
+    {
+        $leadId = $this->messages()
+            ->where('direction', 'in')
+            ->whereNotNull('lead_id')
+            ->latest()
+            ->value('lead_id');
+
+        if ($leadId !== null) {
+            return $this->leads()->find($leadId);
+        }
+
+        return $this->leads()->whereNotNull('last_contacted_at')->latest('last_contacted_at')->first();
+    }
+
     public function smsPending(): bool
     {
         return $this->a2p_status === 'pending';
