@@ -51,6 +51,23 @@ class Billing extends Component
         session()->flash('status', 'Subscription resumed.');
     }
 
+    /**
+     * Stripe's hosted Customer Portal for self-service management (update card,
+     * download invoices, cancel). Recommended over building these ourselves.
+     */
+    public function manageBilling(): ?RedirectResponse
+    {
+        $user = auth()->user();
+
+        if (! $user->hasStripeId()) {
+            session()->flash('error', 'No billing account yet - subscribe first.');
+
+            return null;
+        }
+
+        return $user->redirectToBillingPortal(route('billing'));
+    }
+
     public function requestGuarantee(BillingService $billing): void
     {
         if ($billing->refundGuarantee(auth()->user()->account)) {

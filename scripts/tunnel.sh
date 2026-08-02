@@ -29,4 +29,11 @@ if [[ -z "$TUNNEL_NAME" ]]; then
     exit 0
 fi
 
-exec cloudflared tunnel run "$TUNNEL_NAME"
+# Per-project config file (the default ~/.cloudflared/config.yml belongs to
+# another app). Point CLOUDFLARED_CONFIG at this app's config.
+CONFIG_ARG=()
+if [[ -n "${CLOUDFLARED_CONFIG:-}" ]]; then
+    CONFIG_ARG=(--config "$CLOUDFLARED_CONFIG")
+fi
+
+exec cloudflared "${CONFIG_ARG[@]}" tunnel run "$TUNNEL_NAME"

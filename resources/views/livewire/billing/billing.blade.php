@@ -29,7 +29,10 @@
                             <button wire:click="resume" class="font-semibold underline">Resume</button>
                         </p>
                     @else
-                        <button wire:click="cancel" class="mt-2 text-sm font-semibold text-red-600 underline">Cancel subscription</button>
+                        <div class="mt-2 flex items-center gap-4">
+                            <button wire:click="manageBilling" class="text-sm font-semibold text-indigo-600 underline">Manage billing &amp; payment method</button>
+                            <button wire:click="cancel" class="text-sm font-semibold text-red-600 underline">Cancel subscription</button>
+                        </div>
                     @endif
                 @elseif ($onTrial)
                     <p>Free trial: <span class="font-semibold">{{ $leadsRemaining }}</span> free leads left @if ($trialDaysLeft !== null), {{ $trialDaysLeft }} days remaining @endif.</p>
