@@ -34,6 +34,9 @@ class RegisteredUserController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
+            'sms_consent' => ['accepted'],
+        ], [
+            'sms_consent.accepted' => 'You must agree to receive SMS messages to use Textback.',
         ]);
 
         $user = User::create([

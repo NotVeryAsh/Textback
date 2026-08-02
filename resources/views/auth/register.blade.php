@@ -44,6 +44,20 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
+        <!-- SMS consent (required; documents opt-in for A2P 10DLC) -->
+        <div class="mt-4">
+            <label for="sms_consent" class="flex items-start gap-2">
+                <input id="sms_consent" name="sms_consent" type="checkbox" value="1" required
+                       class="mt-1 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" {{ old('sms_consent') ? 'checked' : '' }}>
+                <span class="text-sm text-gray-600">
+                    I agree to receive SMS text messages from Textback, including a one-time verification code and account notifications. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. See our
+                    <a href="{{ route('privacy') }}" class="text-indigo-600 underline" target="_blank">Privacy Policy</a> and
+                    <a href="{{ route('terms') }}" class="text-indigo-600 underline" target="_blank">Terms</a>.
+                </span>
+            </label>
+            <x-input-error :messages="$errors->get('sms_consent')" class="mt-2" />
+        </div>
+
         <div class="flex items-center justify-end mt-4">
             <a class="underline text-sm text-gray-600 hover:text-gray-900 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" href="{{ route('login') }}">
                 {{ __('Already registered?') }}
