@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
+use App\Support\Phone;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,15 +34,18 @@ class RegisteredUserController extends Controller
         $request->validate([
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
+            'phone' => ['required', 'string', 'max:30', 'phone:US'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
             'sms_consent' => ['accepted'],
         ], [
+            'phone.phone' => 'Enter a valid US mobile number so we can text your verification code.',
             'sms_consent.accepted' => 'You must agree to receive SMS messages to use Textback.',
         ]);
 
         $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
+            'phone' => Phone::normalize($request->phone),
             'password' => Hash::make($request->password),
         ]);
 

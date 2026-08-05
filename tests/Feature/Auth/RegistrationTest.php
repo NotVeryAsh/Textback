@@ -21,6 +21,7 @@ class RegistrationTest extends TestCase
         $response = $this->post('/register', [
             'name' => 'Test User',
             'email' => 'test@example.com',
+            'phone' => '(425) 472-1713',
             'password' => 'password',
             'password_confirmation' => 'password',
             'sms_consent' => '1',
@@ -28,5 +29,21 @@ class RegistrationTest extends TestCase
 
         $this->assertAuthenticated();
         $response->assertRedirect(route('dashboard', absolute: false));
+        $this->assertSame('+14254721713', auth()->user()->phone);
+    }
+
+    public function test_registration_requires_a_valid_phone(): void
+    {
+        $response = $this->from('/register')->post('/register', [
+            'name' => 'Test User',
+            'email' => 'test@example.com',
+            'phone' => 'not-a-number',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'sms_consent' => '1',
+        ]);
+
+        $response->assertSessionHasErrors('phone');
+        $this->assertGuest();
     }
 }

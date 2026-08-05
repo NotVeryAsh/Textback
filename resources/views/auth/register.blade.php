@@ -21,6 +21,14 @@
             <x-input-error :messages="$errors->get('email')" class="mt-2" />
         </div>
 
+        <!-- Mobile number (the number that receives SMS; ties to the consent below) -->
+        <div class="mt-4">
+            <x-input-label for="phone" :value="__('Mobile number')" />
+            <x-text-input id="phone" class="block mt-1 w-full" type="tel" name="phone" :value="old('phone')" required autocomplete="tel" placeholder="(555) 123-4567" />
+            <p class="mt-1 text-xs text-gray-500">We text your verification code and account alerts to this number.</p>
+            <x-input-error :messages="$errors->get('phone')" class="mt-2" />
+        </div>
+
         <!-- Password -->
         <div class="mt-4">
             <x-input-label for="password" :value="__('Password')" />
@@ -50,7 +58,7 @@
                 <input id="sms_consent" name="sms_consent" type="checkbox" value="1" required
                        class="mt-1 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" {{ old('sms_consent') ? 'checked' : '' }}>
                 <span class="text-sm text-gray-600">
-                    I agree to receive SMS text messages from Textback, including a one-time verification code and account notifications. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. See our
+                    I agree to receive SMS text messages from Textback at the mobile number above, including a one-time verification code and account notifications. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. See our
                     <a href="{{ route('privacy') }}" class="text-indigo-600 underline" target="_blank">Privacy Policy</a> and
                     <a href="{{ route('terms') }}" class="text-indigo-600 underline" target="_blank">Terms</a>.
                 </span>

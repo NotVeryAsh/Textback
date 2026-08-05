@@ -55,7 +55,8 @@ class Wizard extends Component
 
         $this->business_name = $this->account->business_name;
         $this->vertical = $this->account->vertical->value;
-        $this->operator_cell = (string) $this->account->operator_cell;
+        // Prefill from the account, falling back to the mobile captured at signup.
+        $this->operator_cell = (string) ($this->account->operator_cell ?? auth()->user()->phone);
 
         // Map any legacy step onto the new 3-step flow.
         $this->step = in_array($this->account->onboarding_step, self::STEPS, true)
