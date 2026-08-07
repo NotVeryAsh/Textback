@@ -24,6 +24,7 @@ class User extends Authenticatable
         'name',
         'email',
         'phone',
+        'sms_opt_in_at',
         'password',
     ];
 
@@ -50,6 +51,7 @@ class User extends Authenticatable
             // Cashier's onGenericTrial() calls ->isFuture() on this, so it must
             // be a Carbon instance, not the raw DB string.
             'trial_ends_at' => 'datetime',
+            'sms_opt_in_at' => 'datetime',
         ];
     }
 

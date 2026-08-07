@@ -36,10 +36,10 @@ class RegisteredUserController extends Controller
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:'.User::class],
             'phone' => ['required', 'string', 'max:30', 'phone:US'],
             'password' => ['required', 'confirmed', Rules\Password::defaults()],
-            'sms_consent' => ['accepted'],
+            // Optional per A2P 10DLC rule 30923 - SMS consent cannot be required for service.
+            'sms_consent' => ['nullable', 'boolean'],
         ], [
             'phone.phone' => 'Enter a valid US mobile number so we can text your verification code.',
-            'sms_consent.accepted' => 'You must agree to receive SMS messages to use Textback.',
         ]);
 
         $user = User::create([
@@ -47,6 +47,8 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'phone' => Phone::normalize($request->phone),
             'password' => Hash::make($request->password),
+            // Record the opt-in only when the box was ticked (proof of consent).
+            'sms_opt_in_at' => $request->boolean('sms_consent') ? now() : null,
         ]);
 
         event(new Registered($user));

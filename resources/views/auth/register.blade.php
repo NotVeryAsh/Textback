@@ -52,13 +52,13 @@
             <x-input-error :messages="$errors->get('password_confirmation')" class="mt-2" />
         </div>
 
-        <!-- SMS consent (required; documents opt-in for A2P 10DLC) -->
+        <!-- SMS consent (OPTIONAL; A2P 10DLC error 30923: consent must not be required for service) -->
         <div class="mt-4">
             <label for="sms_consent" class="flex items-start gap-2">
-                <input id="sms_consent" name="sms_consent" type="checkbox" value="1" required
+                <input id="sms_consent" name="sms_consent" type="checkbox" value="1"
                        class="mt-1 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" {{ old('sms_consent') ? 'checked' : '' }}>
                 <span class="text-sm text-gray-600">
-                    I agree to receive SMS text messages from Textback at the mobile number above, including a one-time verification code and account notifications. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. See our
+                    <span class="font-medium text-gray-700">Optional:</span> I agree to receive SMS text messages from Textback at the mobile number above, including a one-time verification code and account notifications. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. This is not required to create an account or use Textback. See our
                     <a href="{{ route('privacy') }}" class="text-indigo-600 underline" target="_blank">Privacy Policy</a> and
                     <a href="{{ route('terms') }}" class="text-indigo-600 underline" target="_blank">Terms</a>.
                 </span>
