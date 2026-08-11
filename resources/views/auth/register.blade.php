@@ -25,7 +25,7 @@
         <div class="mt-4">
             <x-input-label for="phone" :value="__('Mobile number')" />
             <x-text-input id="phone" class="block mt-1 w-full" type="tel" name="phone" :value="old('phone')" required autocomplete="tel" placeholder="(555) 123-4567" />
-            <p class="mt-1 text-xs text-gray-500">We text your verification code and account alerts to this number.</p>
+            <p class="mt-1 text-xs text-gray-500">Used for call forwarding, and — if you opt in below — account notification texts.</p>
             <x-input-error :messages="$errors->get('phone')" class="mt-2" />
         </div>
 
@@ -58,7 +58,7 @@
                 <input id="sms_consent" name="sms_consent" type="checkbox" value="1"
                        class="mt-1 rounded border-gray-300 text-indigo-600 shadow-sm focus:ring-indigo-500" {{ old('sms_consent') ? 'checked' : '' }}>
                 <span class="text-sm text-gray-600">
-                    <span class="font-medium text-gray-700">Optional:</span> I agree to receive SMS text messages from Textback at the mobile number above, including a one-time verification code and account notifications. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. This is not required to create an account or use Textback. See our
+                    <span class="font-medium text-gray-700">Optional:</span> I agree to receive account notification text messages from Textback at the mobile number above — for example missed-call alerts, customer-reply alerts, and account and setup messages. Message frequency varies. Message and data rates may apply. Reply STOP to opt out, HELP for help. Not required to create an account or use Textback. See our
                     <a href="{{ route('privacy') }}" class="text-indigo-600 underline" target="_blank">Privacy Policy</a> and
                     <a href="{{ route('terms') }}" class="text-indigo-600 underline" target="_blank">Terms</a>.
                 </span>
