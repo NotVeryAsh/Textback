@@ -23,15 +23,17 @@ class SendSms implements ShouldQueue
 
     public function handle(TwilioClientFactory $factory): void
     {
-        $message = Message::find($this->messageId);
+        $message = Message::with('account')->find($this->messageId);
 
         if ($message === null) {
             return;
         }
 
+        $account = $message->account;
+
         // No Twilio creds: record a clear status instead of failing so the
         // app is fully usable in local/concierge mode.
-        if (! $factory->configured()) {
+        if (! $factory->configured($account)) {
             $message->update(['status' => 'skipped_no_twilio']);
             Log::info('SMS skipped (Twilio not configured)', [
                 'to' => $message->to,
@@ -42,10 +44,12 @@ class SendSms implements ShouldQueue
         }
 
         try {
-            $messagingServiceSid = config('services.twilio.messaging_service_sid');
+            // Account's own messaging service (per-client Twilio account)
+            // falls back to the global platform one.
+            $messagingServiceSid = $account?->messagingServiceSid();
 
             $params = array_filter([
-                'messagingServiceSid' => $messagingServiceSid ?: null,
+                'messagingServiceSid' => $messagingServiceSid,
                 'from' => $messagingServiceSid ? null : $message->from,
                 'body' => $message->body,
                 // Future MMS: when a media_url is set, Twilio sends it as MMS.
@@ -53,7 +57,7 @@ class SendSms implements ShouldQueue
                 'statusCallback' => route('webhooks.twilio.status'),
             ], fn ($value) => $value !== null);
 
-            $sent = $factory->make()->messages->create($message->to, $params);
+            $sent = $factory->for($account)->messages->create($message->to, $params);
 
             $message->update([
                 'twilio_sid' => $sent->sid,

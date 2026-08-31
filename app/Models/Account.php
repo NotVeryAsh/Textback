@@ -26,11 +26,31 @@ class Account extends Model
         return [
             'vertical' => Vertical::class,
             'caller_id_mode' => CallerIdMode::class,
+            'twilio_auth_token' => 'encrypted',
             'operator_cell_verified_at' => 'datetime',
             'is_live' => 'boolean',
             'setup_dismissed' => 'boolean',
             'leads_recovered_count' => 'integer',
         ];
+    }
+
+    /**
+     * True when this account runs in its own Twilio account (per-client
+     * bridge model) rather than the shared platform credentials.
+     */
+    public function usesOwnTwilio(): bool
+    {
+        return filled($this->twilio_account_sid) && filled($this->twilio_auth_token);
+    }
+
+    /**
+     * The messaging service this account sends through: its own if set,
+     * otherwise the global platform one.
+     */
+    public function messagingServiceSid(): ?string
+    {
+        return $this->twilio_messaging_service_sid
+            ?: (config('services.twilio.messaging_service_sid') ?: null);
     }
 
     /** @return BelongsTo<User, $this> */

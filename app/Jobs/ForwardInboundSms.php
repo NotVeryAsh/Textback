@@ -43,7 +43,7 @@ class ForwardInboundSms implements ShouldQueue
             Str::limit($this->body, 120),
         );
 
-        if (! $factory->configured()) {
+        if (! $factory->configured($account)) {
             Log::info('Inbound reply forward skipped (Twilio not configured)', [
                 'operator' => $account->operator_cell,
                 'notice' => $notice,
@@ -52,10 +52,10 @@ class ForwardInboundSms implements ShouldQueue
             return;
         }
 
-        $messagingServiceSid = config('services.twilio.messaging_service_sid');
+        $messagingServiceSid = $account->messagingServiceSid();
 
-        $factory->make()->messages->create($account->operator_cell, array_filter([
-            'messagingServiceSid' => $messagingServiceSid ?: null,
+        $factory->for($account)->messages->create($account->operator_cell, array_filter([
+            'messagingServiceSid' => $messagingServiceSid,
             'from' => $messagingServiceSid ? null : $account->twilio_number,
             'body' => $notice,
         ], fn ($value) => $value !== null));

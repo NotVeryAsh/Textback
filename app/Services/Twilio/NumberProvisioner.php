@@ -12,18 +12,19 @@ class NumberProvisioner
 {
     public function __construct(private TwilioClientFactory $factory) {}
 
-    public function configured(): bool
+    public function configured(?Account $account = null): bool
     {
-        return $this->factory->configured();
+        return $this->factory->configured($account);
     }
 
     /**
      * Search for, purchase, and configure a fresh local Twilio number, then
      * point its voice + SMS webhooks at this app. Requires Twilio creds.
+     * Buys in the account's own Twilio account when it has credentials.
      */
     public function provision(Account $account, ?string $areaCode = null): PhoneNumber
     {
-        $client = $this->factory->make();
+        $client = $this->factory->for($account);
 
         $searchParams = ['smsEnabled' => true, 'voiceEnabled' => true];
         if ($areaCode !== null && $areaCode !== '') {
